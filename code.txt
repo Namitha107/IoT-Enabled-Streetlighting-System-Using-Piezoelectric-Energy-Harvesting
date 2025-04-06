@@ -1,0 +1,63 @@
+#include <LiquidCrystal.h>
+const int rs = 13, en = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+#define ANALOG_IN_PIN A4
+int count=0; 
+// Floats for ADC voltage & Input voltage
+float adc_voltage = 0.0;
+float in_voltage = 0.0;
+ 
+// Floats for resistor values in divider (in ohms)
+float R1 = 30000.0;
+float R2 = 7500.0; 
+ 
+// Float for Reference Voltage
+float ref_voltage = 5.0;
+ 
+// Integer for ADC value
+int adc_value = 0;
+
+int ldr=A5;
+
+int l1=A0;
+int l2=A1;
+int l3=A2;
+void setup() 
+{
+  pinMode(l1,OUTPUT);pinMode(l2,OUTPUT);pinMode(l3,OUTPUT);
+  digitalWrite(l1,LOW);digitalWrite(l2,LOW);digitalWrite(l3,LOW);
+  pinMode(ldr,INPUT);
+  lcd.begin(16, 2);
+  lcd.clear();lcd.print("Foot Step Power");
+  lcd.setCursor(0,1);lcd.print("Generation System");delay(1000);
+  lcd.clear();
+}
+
+void loop()
+{
+ adc_value = analogRead(ANALOG_IN_PIN);
+ adc_voltage  = (adc_value * ref_voltage) / 1024.0;
+ in_voltage = adc_voltage*(R1+R2)/R2;
+ if(in_voltage>0.5)
+ {
+  count++;
+  lcd.clear();lcd.print("V:");lcd.print(in_voltage );delay(200);
+  lcd.print(" steps:");lcd.print(count);delay(100);
+ }
+ 
+  int ldrval=digitalRead(ldr);
+  if(ldrval==LOW)
+  {
+  lcd.setCursor(0,1);lcd.print("DAY TIME   ");delay(10); 
+  digitalWrite(l1,LOW);digitalWrite(l2,LOW);digitalWrite(l3,LOW); 
+  }
+  else
+  {
+  lcd.setCursor(0,1);lcd.print("NIGHT TIME");delay(10);
+  digitalWrite(l1,HIGH);delay(5);
+  digitalWrite(l2,HIGH);delay(5);
+  digitalWrite(l3,HIGH);delay(5);
+  
+  }
+  
+}
